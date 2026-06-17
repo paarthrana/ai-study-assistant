@@ -10,6 +10,13 @@ def load_api():
 
     return client
 
+def save_history(question,answer):
+    with open("history.txt","a") as file:
+        file.write(f"you:{question}\n")
+        file.write(f"AI:{answer}\n")
+        file.write("--"* 40 + "\n")
+
+
 def get_response(client , question):
     response=client.models.generate_content(
         model="gemini-2.5-flash",
@@ -31,6 +38,7 @@ def main():
 
         print("\n AI :")
         print(answer)
+        save_history(question,answer)
         print()
 
 if __name__ == "__main__":
