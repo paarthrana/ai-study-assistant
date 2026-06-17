@@ -1,32 +1,37 @@
 from google import genai
-from dotenv import load_dotenv
-import os
+import os 
+from dotenv import load_dotenv 
 
-load_dotenv()
+def load_api():
+    load_dotenv()
+    api_key=os.getenv("GEMINI_API_KEY")
 
-api_key=os.getenv("GEMINI_API_KEY")
+    client=genai.Client(api_key=api_key)
 
-client =genai.Client(api_key=api_key)
+    return client
 
-try:
- print("=====AI STUDY ASSISTANT====={type \"exit\" to leave}")
- while True:
-  
-  question = input("ASK:\t")
-  if question.strip()=="":
-     print("Please enter a question") 
-     continue
-  elif question.lower()=="exit":
-   break
-  response=client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents=question
-)
-  print("\nAI: ")
-  print(response.text)
-  print()
-  
+def get_response(client , question):
+    response=client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=question
+    )
+    return response.text
 
-except Exception as e:
- print("Error found",e)
+def main():
+    client=load_api()
+    print("====Ai Study Assistant====")
+    print("Type'exit'to quit")
 
+    while True:
+        question=input("Ask : ")
+        if question.lower()=="exit":
+            break
+        
+        answer=get_response(client,question)
+
+        print("\n AI :")
+        print(answer)
+        print()
+
+if __name__ == "__main__":
+  main()
