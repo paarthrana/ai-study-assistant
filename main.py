@@ -2,6 +2,7 @@ from google import genai
 import os 
 from dotenv import load_dotenv 
 
+
 def load_api():
     load_dotenv()
     api_key=os.getenv("GEMINI_API_KEY")
@@ -24,12 +25,16 @@ def get_response(client , question):
     )
     return response.text
 
-def main():
-    client=load_api()
-    print("====Ai Study Assistant====")
-    print("Type'exit'to quit")
 
-    while True:
+
+def main():
+    try :
+
+     client=load_api()
+     print("====Ai Study Assistant====")
+     print("Type'exit'to quit")
+
+     while True:
         question=input("Ask : ")
         if question.lower()=="exit":
             break
@@ -40,6 +45,8 @@ def main():
         print(answer)
         save_history(question,answer)
         print()
-
+ 
+    except Exception as e:
+        print("some error occured", e)
 if __name__ == "__main__":
   main()
