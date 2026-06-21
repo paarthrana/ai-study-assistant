@@ -1,7 +1,7 @@
 from google import genai
 import os 
 from dotenv import load_dotenv 
-
+import json
 
 def load_api():
     load_dotenv()
@@ -11,11 +11,35 @@ def load_api():
 
     return client
 
-def save_history(question,answer):
-    with open("history.txt","a") as file:
-        file.write(f"you:{question}\n")
-        file.write(f"AI:{answer}\n")
-        file.write("--"* 40 + "\n")
+def save_history(mode, topic , answer):
+    try:
+        entry={
+        "mode":mode,
+        "topic":topic,
+        "answer":answer
+        }
+    
+        with open("history.json","r") as file:
+            data=json.load(file)
+            data.append(entry)
+        with open("history.json","w") as file:
+            json.dump(data,file,indent=4)
+
+    except Exception as e:
+        data=[]
+        data.append(entry)
+        with open("history.json","w") as file:
+            json.dump(data, file, indent=4)
+
+def veiw_history():
+    try :
+      with open ("history.txt","r")as file:
+       history =file.read()
+       print("\n===== Chat History =====\n")
+       print(history)
+    except Exception as e:
+       print("History not found")
+       print(type(e).__name__)
 
 
 def get_response(client , question):
@@ -47,15 +71,16 @@ def main():
         print("2. Explain like i'm 5")
         print("3. Quiz me")
         print("4. Summarise Topic")
-        print("5. Exit")
+        print("5. Veiw history")
+        print("6. Exit")
         choice = input("Enter a choice : ")
-        if choice =="5":
+        if choice =="6":
             break
         elif choice=="1":
            question=input("\nASK:")
            answer = get_response(client,question)
            print(answer)
-           save_history(question,answer)
+           save_history("Ask",question,answer)
 
         elif choice=="2":
            topic =input("Enter a topic:")
@@ -65,11 +90,11 @@ def main():
            '''
            answer=get_response(client,prompt)
            print(answer)
-           save_history(f"ELI5:{topic}",answer)
+           save_history("ELI5",topic ,answer)
 
         elif choice=="3":
            topic =input("Enter a topic:")
-           prompt=f''' Create 5 multiple choice questions on :
+           prompt=f''' Create 7 multiple choice questions on :
            {topic}
            provide
            -questions
@@ -78,7 +103,7 @@ def main():
            '''
            answer=get_response(client ,prompt)
            print(answer)
-           save_history(f"Quiz:{topic}", answer)
+           save_history("Quiz", topic ,answer)
 
         elif choice=="4":
            topic =input("Enter a topic:")
@@ -88,7 +113,10 @@ def main():
            '''
            answer=get_response(client ,prompt)
            print(answer)
-           save_history(f"Summarise:{topic}", answer)
+           save_history("Summarise", topic ,answer)
+
+        elif choice=="5":
+           veiw_history()
 
 
 
@@ -97,5 +125,6 @@ def main():
         print("ERROR:")
         print(type(e).__name__)
         print(e)
+
 if __name__ == "__main__":
   main()
